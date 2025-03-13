@@ -1,0 +1,15 @@
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.logs
+*.iml
+.idea/
+.settings/
+.project
+.classpath
+.springBeans
+.factorypath
+.apt_generated/
+.DS_Store 
