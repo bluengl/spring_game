@@ -1,0 +1,52 @@
+game:
+  security:
+    cors:
+      allowed-origins:
+        - http://localhost:8080
+        - http://127.0.0.1:8080
+        - http://localhost:3000
+        - http://localhost:8002
+        - http://127.0.0.1:8002
+      exposed-headers:
+        - Authorization
+      allowed-headers:
+        - Content-Type
+        - Authorization
+        - X-Requested-With
+        - x-encrypted
+        - x-encrypt-type
+        - Access-Control-Request-Headers
+        - Access-Control-Request-Method
+        - Access-Control-Allow-Origin
+        - Origin
+        - Accept
+        - content-type
+        - authorization
+      allowed-methods:
+        - POST
+        - GET
+        - DELETE
+        - UPDATE
+        - OPTIONS
+      allow-credentials: true
+      max-age: 3600
+    jwt:
+      secret: hfdjshfjdhfdsjfhsdjfhkdshfksddfdsfsdfsdfdsfdsfdsfdsfdsfdsf
+      expiration: 86400000
+      header: Authorization
+      prefix: Bearer
+      allow-refresh: true
+      refresh-expiration: 604800000
+    ignore:
+      urls:
+        - /api/base/getOpenId
+        - /api/base/login
+        - /api/base/register
+        - /api/base/getSystemConfig
+        - /error
+        - /actuator/**
+        - /v3/api-docs/**
+        - /swagger-ui/**
+        - /swagger-resources/**
+        - /webjars/**
+        - /favicon.ico

@@ -1,0 +1,264 @@
+{
+  "groups": [
+    {
+      "name": "game.common",
+      "type": "com.ngl.idea.game.common.config.properties.CommonProperties",
+      "sourceType": "com.ngl.idea.game.common.config.properties.CommonProperties"
+    },
+    {
+      "name": "game.encryption",
+      "type": "com.ngl.idea.game.common.config.properties.EncryptionProperties",
+      "sourceType": "com.ngl.idea.game.common.config.properties.EncryptionProperties"
+    },
+    {
+      "name": "game.encryption.encryption",
+      "type": "com.ngl.idea.game.common.config.properties.EncryptionProperties$EncryptionConfig",
+      "sourceType": "com.ngl.idea.game.common.config.properties.EncryptionProperties",
+      "sourceMethod": "public com.ngl.idea.game.common.config.properties.EncryptionProperties.EncryptionConfig getEncryption() "
+    },
+    {
+      "name": "game.encryption.ignore",
+      "type": "com.ngl.idea.game.common.config.properties.EncryptionProperties$IgnoreConfig",
+      "sourceType": "com.ngl.idea.game.common.config.properties.EncryptionProperties",
+      "sourceMethod": "public com.ngl.idea.game.common.config.properties.EncryptionProperties.IgnoreConfig getIgnore() "
+    },
+    {
+      "name": "game.security",
+      "type": "com.ngl.idea.game.common.config.properties.SecurityProperties",
+      "sourceType": "com.ngl.idea.game.common.config.properties.SecurityProperties"
+    },
+    {
+      "name": "game.security.cors",
+      "type": "com.ngl.idea.game.common.config.properties.SecurityProperties$CorsProperties",
+      "sourceType": "com.ngl.idea.game.common.config.properties.SecurityProperties",
+      "sourceMethod": "public com.ngl.idea.game.common.config.properties.SecurityProperties.CorsProperties getCors() "
+    },
+    {
+      "name": "game.security.ignore",
+      "type": "com.ngl.idea.game.common.config.properties.SecurityProperties$IgnoreProperties",
+      "sourceType": "com.ngl.idea.game.common.config.properties.SecurityProperties",
+      "sourceMethod": "public com.ngl.idea.game.common.config.properties.SecurityProperties.IgnoreProperties getIgnore() "
+    },
+    {
+      "name": "game.security.jwt",
+      "type": "com.ngl.idea.game.common.config.properties.SecurityProperties$JwtProperties",
+      "sourceType": "com.ngl.idea.game.common.config.properties.SecurityProperties",
+      "sourceMethod": "public com.ngl.idea.game.common.config.properties.SecurityProperties.JwtProperties getJwt() "
+    },
+    {
+      "name": "mybatis-plus",
+      "type": "com.ngl.idea.game.common.config.properties.MybatisPlusProperties",
+      "sourceType": "com.ngl.idea.game.common.config.properties.MybatisPlusProperties"
+    },
+    {
+      "name": "mybatis-plus.configuration",
+      "type": "com.ngl.idea.game.common.config.properties.MybatisPlusProperties$Configuration",
+      "sourceType": "com.ngl.idea.game.common.config.properties.MybatisPlusProperties",
+      "sourceMethod": "public com.ngl.idea.game.common.config.properties.MybatisPlusProperties.Configuration getConfiguration() "
+    },
+    {
+      "name": "spring.datasource",
+      "type": "com.ngl.idea.game.common.config.properties.DataSourceProperties",
+      "sourceType": "com.ngl.idea.game.common.config.properties.DataSourceProperties"
+    },
+    {
+      "name": "spring.datasource.hikari",
+      "type": "com.ngl.idea.game.common.config.properties.DataSourceProperties$HikariProperties",
+      "sourceType": "com.ngl.idea.game.common.config.properties.DataSourceProperties",
+      "sourceMethod": "public com.ngl.idea.game.common.config.properties.DataSourceProperties.HikariProperties getHikari() "
+    }
+  ],
+  "properties": [
+    {
+      "name": "game.common.allowed-origins",
+      "type": "java.util.List<java.lang.String>",
+      "sourceType": "com.ngl.idea.game.common.config.properties.CommonProperties"
+    },
+    {
+      "name": "game.common.max-file-size",
+      "type": "java.lang.Long",
+      "sourceType": "com.ngl.idea.game.common.config.properties.CommonProperties"
+    },
+    {
+      "name": "game.common.max-request-size",
+      "type": "java.lang.Long",
+      "sourceType": "com.ngl.idea.game.common.config.properties.CommonProperties"
+    },
+    {
+      "name": "game.common.upload-path",
+      "type": "java.lang.String",
+      "sourceType": "com.ngl.idea.game.common.config.properties.CommonProperties"
+    },
+    {
+      "name": "game.encryption.enabled",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.ngl.idea.game.common.config.properties.EncryptionProperties"
+    },
+    {
+      "name": "game.encryption.encryption-type",
+      "type": "java.lang.String",
+      "sourceType": "com.ngl.idea.game.common.config.properties.EncryptionProperties"
+    },
+    {
+      "name": "game.encryption.encryption.iv",
+      "type": "java.lang.String",
+      "sourceType": "com.ngl.idea.game.common.config.properties.EncryptionProperties$EncryptionConfig"
+    },
+    {
+      "name": "game.encryption.encryption.secret",
+      "type": "java.lang.String",
+      "sourceType": "com.ngl.idea.game.common.config.properties.EncryptionProperties$EncryptionConfig"
+    },
+    {
+      "name": "game.encryption.ignore.urls",
+      "type": "java.util.List<java.lang.String>",
+      "sourceType": "com.ngl.idea.game.common.config.properties.EncryptionProperties$IgnoreConfig"
+    },
+    {
+      "name": "game.security.cors.allow-credentials",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.ngl.idea.game.common.config.properties.SecurityProperties$CorsProperties"
+    },
+    {
+      "name": "game.security.cors.allowed-headers",
+      "type": "java.util.List<java.lang.String>",
+      "sourceType": "com.ngl.idea.game.common.config.properties.SecurityProperties$CorsProperties"
+    },
+    {
+      "name": "game.security.cors.allowed-methods",
+      "type": "java.util.List<java.lang.String>",
+      "sourceType": "com.ngl.idea.game.common.config.properties.SecurityProperties$CorsProperties"
+    },
+    {
+      "name": "game.security.cors.allowed-origins",
+      "type": "java.util.List<java.lang.String>",
+      "sourceType": "com.ngl.idea.game.common.config.properties.SecurityProperties$CorsProperties"
+    },
+    {
+      "name": "game.security.cors.exposed-headers",
+      "type": "java.util.List<java.lang.String>",
+      "sourceType": "com.ngl.idea.game.common.config.properties.SecurityProperties$CorsProperties"
+    },
+    {
+      "name": "game.security.cors.max-age",
+      "type": "java.lang.Long",
+      "sourceType": "com.ngl.idea.game.common.config.properties.SecurityProperties$CorsProperties"
+    },
+    {
+      "name": "game.security.ignore.urls",
+      "type": "java.util.List<java.lang.String>",
+      "sourceType": "com.ngl.idea.game.common.config.properties.SecurityProperties$IgnoreProperties"
+    },
+    {
+      "name": "game.security.jwt.allow-refresh",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.ngl.idea.game.common.config.properties.SecurityProperties$JwtProperties"
+    },
+    {
+      "name": "game.security.jwt.expiration",
+      "type": "java.lang.Long",
+      "sourceType": "com.ngl.idea.game.common.config.properties.SecurityProperties$JwtProperties"
+    },
+    {
+      "name": "game.security.jwt.header",
+      "type": "java.lang.String",
+      "sourceType": "com.ngl.idea.game.common.config.properties.SecurityProperties$JwtProperties"
+    },
+    {
+      "name": "game.security.jwt.prefix",
+      "type": "java.lang.String",
+      "sourceType": "com.ngl.idea.game.common.config.properties.SecurityProperties$JwtProperties"
+    },
+    {
+      "name": "game.security.jwt.refresh-expiration",
+      "type": "java.lang.Long",
+      "sourceType": "com.ngl.idea.game.common.config.properties.SecurityProperties$JwtProperties"
+    },
+    {
+      "name": "game.security.jwt.secret",
+      "type": "java.lang.String",
+      "sourceType": "com.ngl.idea.game.common.config.properties.SecurityProperties$JwtProperties"
+    },
+    {
+      "name": "mybatis-plus.configuration.log-impl",
+      "type": "java.lang.String",
+      "sourceType": "com.ngl.idea.game.common.config.properties.MybatisPlusProperties$Configuration"
+    },
+    {
+      "name": "mybatis-plus.configuration.map-underscore-to-camel-case",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.ngl.idea.game.common.config.properties.MybatisPlusProperties$Configuration"
+    },
+    {
+      "name": "mybatis-plus.mapper-locations",
+      "type": "java.lang.String",
+      "sourceType": "com.ngl.idea.game.common.config.properties.MybatisPlusProperties"
+    },
+    {
+      "name": "mybatis-plus.type-aliases-package",
+      "type": "java.lang.String",
+      "sourceType": "com.ngl.idea.game.common.config.properties.MybatisPlusProperties"
+    },
+    {
+      "name": "spring.datasource.driver-class-name",
+      "type": "java.lang.String",
+      "sourceType": "com.ngl.idea.game.common.config.properties.DataSourceProperties"
+    },
+    {
+      "name": "spring.datasource.hikari.auto-commit",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.ngl.idea.game.common.config.properties.DataSourceProperties$HikariProperties"
+    },
+    {
+      "name": "spring.datasource.hikari.connection-test-query",
+      "type": "java.lang.String",
+      "sourceType": "com.ngl.idea.game.common.config.properties.DataSourceProperties$HikariProperties"
+    },
+    {
+      "name": "spring.datasource.hikari.connection-timeout",
+      "type": "java.lang.Long",
+      "sourceType": "com.ngl.idea.game.common.config.properties.DataSourceProperties$HikariProperties"
+    },
+    {
+      "name": "spring.datasource.hikari.idle-timeout",
+      "type": "java.lang.Long",
+      "sourceType": "com.ngl.idea.game.common.config.properties.DataSourceProperties$HikariProperties"
+    },
+    {
+      "name": "spring.datasource.hikari.max-lifetime",
+      "type": "java.lang.Long",
+      "sourceType": "com.ngl.idea.game.common.config.properties.DataSourceProperties$HikariProperties"
+    },
+    {
+      "name": "spring.datasource.hikari.maximum-pool-size",
+      "type": "java.lang.Integer",
+      "sourceType": "com.ngl.idea.game.common.config.properties.DataSourceProperties$HikariProperties"
+    },
+    {
+      "name": "spring.datasource.hikari.minimum-idle",
+      "type": "java.lang.Integer",
+      "sourceType": "com.ngl.idea.game.common.config.properties.DataSourceProperties$HikariProperties"
+    },
+    {
+      "name": "spring.datasource.hikari.pool-name",
+      "type": "java.lang.String",
+      "sourceType": "com.ngl.idea.game.common.config.properties.DataSourceProperties$HikariProperties"
+    },
+    {
+      "name": "spring.datasource.password",
+      "type": "java.lang.String",
+      "sourceType": "com.ngl.idea.game.common.config.properties.DataSourceProperties"
+    },
+    {
+      "name": "spring.datasource.url",
+      "type": "java.lang.String",
+      "sourceType": "com.ngl.idea.game.common.config.properties.DataSourceProperties"
+    },
+    {
+      "name": "spring.datasource.username",
+      "type": "java.lang.String",
+      "sourceType": "com.ngl.idea.game.common.config.properties.DataSourceProperties"
+    }
+  ],
+  "hints": []
+}
