@@ -15,7 +15,7 @@ spring:
       connection-test-query: SELECT 1
 mybatis-plus:
   mapper-locations: classpath*:/mapper/**/*.xml
-  type-aliases-package: com.game.base.entity
+  type-aliases-package: com.ngl.idea.game.core.entity
   configuration:
     map-underscore-to-camel-case: true
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

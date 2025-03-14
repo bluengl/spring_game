@@ -1,5 +1,6 @@
 package com.ngl.idea.game.common.core.model;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -27,5 +28,17 @@ public class TokenUser implements Serializable {
      * 密码
      */
     private String password;
+
+    /**
+     * token编码，不参与数据库操作
+     */
+    @TableField(exist = false)
+    private String tokenCode;
+
+    /**
+     * token类型，区分accessToken和refreshToken
+     */
+    @TableField(exist = false)
+    private String tokenType;
 
 }

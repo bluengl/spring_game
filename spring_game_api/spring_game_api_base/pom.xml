@@ -12,19 +12,29 @@
     <artifactId>spring_game_api_base</artifactId>
 
     <dependencies>
+        <!-- Core Module -->
+        <dependency>
+            <groupId>com.ngl.idea.game</groupId>
+            <artifactId>spring_game_api_core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- Spring Boot Web -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+
+        <!-- MyBatis Plus -->
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-boot-starter</artifactId>
-            <version>${mybatis-plus.version}</version>
         </dependency>
+
+        <!-- MySQL -->
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>${mysql.version}</version>
         </dependency>
 
         <!-- Lombok -->

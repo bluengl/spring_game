@@ -24,19 +24,14 @@
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-boot-starter</artifactId>
-        </dependency>
-
-        <!-- Common Core -->
-        <dependency>
-            <groupId>com.ngl.idea.game</groupId>
-            <artifactId>spring_game_common_core</artifactId>
+            <version>${mybatis-plus.version}</version>
         </dependency>
 
         <!-- MySQL Driver -->
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <scope>runtime</scope>
+            <version>${mysql.version}</version>
         </dependency>
 
         <!-- Lombok -->

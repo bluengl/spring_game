@@ -1,6 +1,9 @@
 package com.ngl.idea.game.common.security.util;
 
 import com.ngl.idea.game.common.core.model.TokenUser;
+import com.ngl.idea.game.common.core.util.RedisUtil;
+import com.ngl.idea.game.common.core.util.UUIDUtils;
+
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
@@ -29,24 +32,39 @@ public class JwtUtils {
     @Resource
     private ConfigManager configManager;
 
+    @Resource
+    private RedisUtil redisUtil;
+
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(configManager.getSecurityConfig().getJwt().getSecret().getBytes());
     }
 
     public String generateToken(TokenUser tokenUser) {
+        String tokenCode = UUIDUtils.getUUID();
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", tokenUser.getUserId());
         claims.put("username", tokenUser.getUsername());
         claims.put("userSource", tokenUser.getUserSource());
-        return createToken(claims, tokenUser.getUserId(), configManager.getSecurityConfig().getJwt().getExpiration());
+        claims.put("tokenCode", tokenCode);
+        claims.put("tokenType", "accessToken");
+        Long expiration = configManager.getSecurityConfig().getJwt().getExpiration();
+        String token = createToken(claims, tokenUser.getUserId(), expiration);
+        redisUtil.set("userTokenCode-" + tokenUser.getUserId(), tokenCode, expiration);
+        return token;
     }
 
     public String generateRefreshToken(TokenUser tokenUser) {
+        String tokenCode = UUIDUtils.getUUID();
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", tokenUser.getUserId());
         claims.put("username", tokenUser.getUsername());
         claims.put("userSource", tokenUser.getUserSource());
-        return createToken(claims, tokenUser.getUserId(), configManager.getSecurityConfig().getJwt().getRefreshExpiration());
+        claims.put("tokenCode", tokenCode);
+        claims.put("tokenType", "refreshToken");
+        Long refreshExpiration = configManager.getSecurityConfig().getJwt().getRefreshExpiration();
+        String token = createToken(claims, tokenUser.getUserId(), refreshExpiration);
+        redisUtil.set("userRefreshTokenCode-" + tokenUser.getUserId(), tokenCode, refreshExpiration);
+        return token;
     }
 
     private String createToken(Map<String, Object> claims, String subject, Long expiration) {
@@ -65,6 +83,8 @@ public class JwtUtils {
         tokenUser.setUserId(claims.get("userId", String.class));
         tokenUser.setUsername(claims.get("username", String.class));
         tokenUser.setUserSource(claims.get("userSource", String.class));
+        tokenUser.setTokenCode(claims.get("tokenCode", String.class));
+        tokenUser.setTokenType(claims.get("tokenType", String.class));
         return tokenUser;
     }
 

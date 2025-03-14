@@ -7,6 +7,8 @@ import com.ngl.idea.game.common.config.properties.SecurityProperties;
 import com.ngl.idea.game.common.core.model.response.ApiResponse;
 import com.ngl.idea.game.common.core.util.RsaUtils;
 import com.ngl.idea.game.common.core.util.Sm2Utils;
+import com.ngl.idea.game.common.security.filter.TokenUserHttpServletRequest;
+import com.ngl.idea.game.base.dto.UserDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -81,6 +83,21 @@ public class BaseController {
         log.info("用户退出登录");
         // 这里可以添加令牌失效的逻辑，如果有需要的话
         return ApiResponse.success();
+    }
+
+    /**
+     * 刷新token
+     *
+     * @param request 刷新token请求
+     * @return 刷新token响应
+     */
+    @PostMapping("/refreshToken")
+    public ApiResponse<LoginResponse> refreshToken(HttpServletRequest request) {
+        log.info("刷新token请求: {}", request);
+        TokenUserHttpServletRequest tokenUserHttpServletRequest = (TokenUserHttpServletRequest) request;
+        String userId = tokenUserHttpServletRequest.getTokenUser().getUserId();
+        LoginResponse response = gmUserService.refreshToken(userId);
+        return ApiResponse.success(response);
     }
 
     /**

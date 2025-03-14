@@ -1,7 +1,7 @@
 package com.ngl.idea.game.base.service;
 
 import com.ngl.idea.game.base.dto.*;
-import com.ngl.idea.game.base.entity.GmUser;
+import com.ngl.idea.game.core.entity.GmUser;
 
 /**
  * 用户服务接口
@@ -29,6 +29,13 @@ public interface GmUserService {
      * @return 用户DTO
      */
     UserDTO register(RegisterRequest request);
+
+    /**
+     * 刷新token
+     * @param userId 用户ID
+     * @return 刷新token响应
+     */
+    LoginResponse refreshToken(String userId);
     
     /**
      * 根据用户名查询用户

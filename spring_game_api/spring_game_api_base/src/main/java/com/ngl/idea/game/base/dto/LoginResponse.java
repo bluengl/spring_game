@@ -21,14 +21,4 @@ public class LoginResponse {
      * 刷新令牌
      */
     private String refreshToken;
-
-    /**
-     * 令牌类型
-     */
-    private String tokenType = "Bearer";
-
-    /**
-     * token过期时间
-     */
-    private Long expiresIn;
 } 

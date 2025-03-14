@@ -2,15 +2,17 @@ package com.ngl.idea.game.base.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ngl.idea.game.base.dto.*;
-import com.ngl.idea.game.base.entity.GmUser;
-import com.ngl.idea.game.base.mapper.GmUserMapper;
 import com.ngl.idea.game.base.service.GmUserService;
 import com.ngl.idea.game.common.config.manager.ConfigManager;
 import com.ngl.idea.game.common.core.exception.BusinessException;
 import com.ngl.idea.game.common.core.model.response.ResultCode;
 import com.ngl.idea.game.common.core.util.AesUtils;
 import com.ngl.idea.game.common.core.util.BcryptUtils;
+import com.ngl.idea.game.common.core.util.RedisUtil;
+import com.ngl.idea.game.common.core.util.UUIDUtils;
 import com.ngl.idea.game.common.security.util.JwtUtils;
+import com.ngl.idea.game.core.entity.GmUser;
+import com.ngl.idea.game.core.mapper.GmUserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -73,8 +75,6 @@ public class GmUserServiceImpl implements GmUserService {
                 decryptedPassword = AesUtils.decryptFromJS(encryptedPassword, "12345678901234567890123456789012");
                 log.debug("原有解密方法成功 [username={}]", request.getUsername());
             }
-            String encode = BcryptUtils.encode("1");
-            System.out.println(BcryptUtils.matches("1", encode));
             // 验证密码
             if (!BcryptUtils.matches(decryptedPassword, user.getPassword())) {
                 log.warn("登录失败: 密码错误 [username={}]", request.getUsername());
@@ -82,17 +82,17 @@ public class GmUserServiceImpl implements GmUserService {
             }
 
             log.debug("密码验证成功，生成令牌 [username={}]", request.getUsername());
-
+            
             // 生成令牌
             String accessToken = jwtUtils.generateToken(user);
             String refreshToken = jwtUtils.generateRefreshToken(user);
-            Long expiresIn = configManager.getSecurityConfig().getJwt().getExpiration();
             // 构建响应
             LoginResponse response = new LoginResponse();
             response.setUser(convertToDTO(user));
             response.setAccessToken(accessToken);
-            response.setRefreshToken(refreshToken);
-            response.setExpiresIn(expiresIn);
+            if (configManager.getSecurityConfig().getJwt().getAllowRefresh()) {
+                response.setRefreshToken(refreshToken);
+            }
             log.info("用户登录成功 [username={}]", request.getUsername());
             return response;
         } catch (Exception e) {
@@ -166,11 +166,38 @@ public class GmUserServiceImpl implements GmUserService {
     }
 
     @Override
+    public LoginResponse refreshToken(String userId) {
+        GmUser user = findByUserId(userId);
+        if (user == null) {
+            throw new BusinessException(ResultCode.USER_NOT_FOUND);
+        }
+        // 生成令牌
+        String accessToken = jwtUtils.generateToken(user);
+        String refreshToken = jwtUtils.generateRefreshToken(user);
+        // 构建响应
+        LoginResponse response = new LoginResponse();
+        response.setUser(convertToDTO(user));
+        response.setAccessToken(accessToken);
+        if (configManager.getSecurityConfig().getJwt().getAllowRefresh()) {
+            response.setRefreshToken(refreshToken);
+        }
+        return response;
+    }
+
+    @Override
     public GmUser findByUsername(String username) {
         LambdaQueryWrapper<GmUser> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(GmUser::getUsername, username)
                 .eq(GmUser::getEffective, "1")
                 .eq(GmUser::getDestroy, "0");
+        return gmUserMapper.selectOne(queryWrapper);
+    }
+
+    private GmUser findByUserId(String userId) {
+        LambdaQueryWrapper<GmUser> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(GmUser::getUserId, userId)
+                   .eq(GmUser::getEffective, "1")
+                   .eq(GmUser::getDestroy, "0");
         return gmUserMapper.selectOne(queryWrapper);
     }
 

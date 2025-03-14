@@ -11,21 +11,55 @@
 
     <artifactId>spring_game_api_user</artifactId>
 
-
     <dependencies>
+        <!-- Spring Game Common Core -->
+        <dependency>
+            <groupId>com.ngl.idea.game</groupId>
+            <artifactId>spring_game_common_core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        
+        <!-- Spring Boot Web -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+
+        <!-- Spring Game API Core -->
         <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-boot-starter</artifactId>
-            <version>${mybatis-plus.version}</version>
+            <groupId>com.ngl.idea.game</groupId>
+            <artifactId>spring_game_api_core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- Spring Game API Base -->
+        <dependency>
+            <groupId>com.ngl.idea.game</groupId>
+            <artifactId>spring_game_api_base</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- Swagger -->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
         </dependency>
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>${mysql.version}</version>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+        </dependency>
+
+        <!-- FastJSON -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+        </dependency>
+
+        <!-- Lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
         </dependency>
     </dependencies>
 
@@ -43,14 +77,6 @@
                         </exclude>
                     </excludes>
                 </configuration>
-                <version>${spring-boot.version}</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>repackage</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>

@@ -13,11 +13,12 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>spring_game_api_core</module>
         <module>spring_game_api_base</module>
-        <module>spring_game_api_game</module>
         <module>spring_game_api_user</module>
-        <module>spring_game_api_online</module>
+        <module>spring_game_api_game</module>
         <module>spring_game_api_group</module>
+        <module>spring_game_api_online</module>
     </modules>
 
     <dependencies>
@@ -40,6 +41,23 @@
             <groupId>com.ngl.idea.game</groupId>
             <artifactId>spring_game_common_encryption</artifactId>
             <version>${project.version}</version>
+        </dependency>
+
+        <!-- Swagger -->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>${swagger.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+            <version>${swagger.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>${fastjson.version}</version>
         </dependency>
     </dependencies>
 </project>
