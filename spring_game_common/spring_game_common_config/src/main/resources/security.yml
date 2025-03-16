@@ -37,6 +37,7 @@ game:
       prefix: Bearer
       allow-refresh: true
       refresh-expiration: 604800000
+      once-login: true
     ignore:
       urls:
         - /api/base/getOpenId

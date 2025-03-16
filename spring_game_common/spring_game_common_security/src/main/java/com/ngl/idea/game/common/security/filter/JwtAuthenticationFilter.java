@@ -1,5 +1,6 @@
 package com.ngl.idea.game.common.security.filter;
 
+import com.ngl.idea.game.common.config.manager.ConfigManager;
 import com.ngl.idea.game.common.core.exception.BusinessException;
 import com.ngl.idea.game.common.core.model.TokenUser;
 import com.ngl.idea.game.common.core.model.response.ResultCode;
@@ -25,7 +26,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         JwtUtils jwtUtils = (JwtUtils) ServiceLocator.getService("jwtUtils");
-        RedisUtil redisUtil = (RedisUtil) ServiceLocator.getService("redisUtil");
         // 获取token
         assert jwtUtils != null;
         String token = jwtUtils.getJwtFromRequest(request);
@@ -55,24 +55,33 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 return;
             }
             String tokenType = tokenUser.getTokenType();
-            String tokenCode = tokenUser.getTokenCode();
-            assert redisUtil != null;
-            String redisTokenCode = (String) redisUtil.get("userTokenCode-" + tokenUser.getUserId());
-            // 判断请求是不是refreshToken
-            if ("refreshToken".equals(tokenType)) {
-                if (!requestURI.contains("/refreshToken")) {
+            ConfigManager configManager = (ConfigManager) ServiceLocator.getService("configManager");
+            if (configManager.getSecurityConfig().getJwt().getOnceLogin()) {  
+                String tokenCode = tokenUser.getTokenCode();
+                RedisUtil redisUtil = (RedisUtil) ServiceLocator.getService("redisUtil");
+                String redisTokenCode = (String) redisUtil.get("userTokenCode-" + tokenUser.getUserId());
+                // 判断请求是不是refreshToken
+                if ("refreshToken".equals(tokenType)) {
+                    if (!requestURI.contains("/refreshToken")) {
+                        defaultResponse(response, "401", "错误使用refreshToken,请重新登录");
+                        return;
+                    } else {
+                        redisTokenCode = (String) redisUtil.get("userRefreshTokenCode-" + tokenUser.getUserId());
+                        if (tokenCode == null || !tokenCode.equals(redisTokenCode)) {
+                            defaultResponse(response, "401", "refreshToken已失效,请重新登录");
+                            return;
+                        }
+                    }
+                } else if (tokenCode == null || !tokenCode.equals(redisTokenCode)) {
+                    defaultResponse(response, "403", "token已失效");
+                    return;
+                }
+            } else {
+                // 判断请求是不是refreshToken
+                if ("refreshToken".equals(tokenType) && !requestURI.contains("/refreshToken")) {
                     defaultResponse(response, "401", "错误使用refreshToken,请重新登录");
                     return;
-                } else {
-                    redisTokenCode = (String) redisUtil.get("userRefreshTokenCode-" + tokenUser.getUserId());
-                    if (tokenCode == null || !tokenCode.equals(redisTokenCode)) {
-                        defaultResponse(response, "401", "refreshToken已失效,请重新登录");
-                        return;
-                    }
                 }
-            } else if (!jwtUtils.validateJwtToken(token) || tokenCode == null || !tokenCode.equals(redisTokenCode)) {
-                defaultResponse(response, "403", "token已失效");
-                return;
             }
 
             // 装饰请求,添加用户信息

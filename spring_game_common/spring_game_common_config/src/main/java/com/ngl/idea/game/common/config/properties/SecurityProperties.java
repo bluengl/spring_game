@@ -79,6 +79,7 @@ public class SecurityProperties {
         private String prefix;
         private Boolean allowRefresh;
         private Long refreshExpiration;
+        private Boolean onceLogin;
 
         // Getters and Setters
         public String getSecret() {
@@ -127,6 +128,14 @@ public class SecurityProperties {
 
         public void setRefreshExpiration(Long refreshExpiration) {
             this.refreshExpiration = refreshExpiration;
+        }
+
+        public Boolean getOnceLogin() {
+            return onceLogin;
+        }
+
+        public void setOnceLogin(Boolean onceLogin) {
+            this.onceLogin = onceLogin;
         }
     }
 
