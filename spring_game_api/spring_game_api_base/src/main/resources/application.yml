@@ -6,6 +6,3 @@ spring:
     name: base-api
   profiles:
     active: dev
-  mvc:
-    cors:
-      enabled: true

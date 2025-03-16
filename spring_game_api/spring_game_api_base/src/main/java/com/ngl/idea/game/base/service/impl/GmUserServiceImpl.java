@@ -8,8 +8,6 @@ import com.ngl.idea.game.common.core.exception.BusinessException;
 import com.ngl.idea.game.common.core.model.response.ResultCode;
 import com.ngl.idea.game.common.core.util.AesUtils;
 import com.ngl.idea.game.common.core.util.BcryptUtils;
-import com.ngl.idea.game.common.core.util.RedisUtil;
-import com.ngl.idea.game.common.core.util.UUIDUtils;
 import com.ngl.idea.game.common.security.util.JwtUtils;
 import com.ngl.idea.game.core.entity.GmUser;
 import com.ngl.idea.game.core.mapper.GmUserMapper;
@@ -32,7 +30,7 @@ public class GmUserServiceImpl implements GmUserService {
     private final GmUserMapper gmUserMapper;
     private final JwtUtils jwtUtils;
     private final ConfigManager configManager;
-    
+
     @Override
     public OpenIdResponse getOpenId(OpenIdRequest request) {
         // 这里应该调用第三方平台API获取OpenId
@@ -55,34 +53,19 @@ public class GmUserServiceImpl implements GmUserService {
             log.warn("登录失败: 用户不存在 [username={}]", request.getUsername());
             throw new BusinessException(ResultCode.USER_NOT_FOUND);
         }
-
+        log.debug("开始解密密码 [username={}]", request.getUsername());
+        String encryptedPassword = request.getPassword();
+        // 添加请求密码日志，方便问题排查
+        log.debug("加密的密码格式: {}", encryptedPassword);
+        // 尝试使用新的简单解密方法
+        String decryptedPassword = AesUtils.decryptSimpleJs(encryptedPassword, "12345678901234567890123456789012");
+        // 验证密码
+        if (!BcryptUtils.matches(decryptedPassword, user.getPassword())) {
+            log.warn("登录失败: 密码错误 [username={}]", request.getUsername());
+            throw new BusinessException(ResultCode.USER_PASSWORD_ERROR);
+        }
+        log.debug("密码验证成功，生成令牌 [username={}]", request.getUsername());
         try {
-            log.debug("开始解密密码 [username={}]", request.getUsername());
-            String encryptedPassword = request.getPassword();
-
-            // 添加请求密码日志，方便问题排查
-            log.debug("加密的密码格式: {}", encryptedPassword);
-
-            // 尝试使用新的简单解密方法
-            String decryptedPassword;
-            try {
-                // 首先尝试新的简单解密方法
-                decryptedPassword = AesUtils.decryptSimpleJs(encryptedPassword, "12345678901234567890123456789012");
-                log.debug("使用SimpleJs解密成功 [username={}]", request.getUsername());
-            } catch (Exception e) {
-                // 如果失败，尝试使用原有方法
-                log.warn("SimpleJs解密失败，尝试使用原有方法: {}", e.getMessage());
-                decryptedPassword = AesUtils.decryptFromJS(encryptedPassword, "12345678901234567890123456789012");
-                log.debug("原有解密方法成功 [username={}]", request.getUsername());
-            }
-            // 验证密码
-            if (!BcryptUtils.matches(decryptedPassword, user.getPassword())) {
-                log.warn("登录失败: 密码错误 [username={}]", request.getUsername());
-                throw new BusinessException(ResultCode.USER_PASSWORD_ERROR);
-            }
-
-            log.debug("密码验证成功，生成令牌 [username={}]", request.getUsername());
-            
             // 生成令牌
             String accessToken = jwtUtils.generateToken(user);
             String refreshToken = jwtUtils.generateRefreshToken(user);
@@ -97,16 +80,7 @@ public class GmUserServiceImpl implements GmUserService {
             return response;
         } catch (Exception e) {
             log.error("用户登录失败 [username={}]: {}", request.getUsername(), e.getMessage(), e);
-            // 判断异常类型，提供更精确的错误信息
-            if (e.getMessage() != null && e.getMessage().contains("Given final block not properly padded")) {
-                throw new BusinessException(ResultCode.DECRYPT_ERROR.getCode(), "密码解密失败：填充错误");
-            } else if (e.getMessage() != null && e.getMessage().contains("Input byte array has incorrect ending byte")) {
-                throw new BusinessException(ResultCode.DECRYPT_ERROR.getCode(), "密码解密失败：Base64格式错误");
-            } else if (e instanceof BusinessException) {
-                throw (BusinessException) e;
-            } else {
-                throw new BusinessException(ResultCode.USER_PASSWORD_ERROR);
-            }
+            throw new BusinessException(ResultCode.TOKEN_GENERATE_ERROR);
         }
     }
 
@@ -173,14 +147,10 @@ public class GmUserServiceImpl implements GmUserService {
         }
         // 生成令牌
         String accessToken = jwtUtils.generateToken(user);
-        String refreshToken = jwtUtils.generateRefreshToken(user);
         // 构建响应
         LoginResponse response = new LoginResponse();
         response.setUser(convertToDTO(user));
         response.setAccessToken(accessToken);
-        if (configManager.getSecurityConfig().getJwt().getAllowRefresh()) {
-            response.setRefreshToken(refreshToken);
-        }
         return response;
     }
 
@@ -196,8 +166,8 @@ public class GmUserServiceImpl implements GmUserService {
     private GmUser findByUserId(String userId) {
         LambdaQueryWrapper<GmUser> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(GmUser::getUserId, userId)
-                   .eq(GmUser::getEffective, "1")
-                   .eq(GmUser::getDestroy, "0");
+                .eq(GmUser::getEffective, "1")
+                .eq(GmUser::getDestroy, "0");
         return gmUserMapper.selectOne(queryWrapper);
     }
 
@@ -205,9 +175,9 @@ public class GmUserServiceImpl implements GmUserService {
     public GmUser findByOpenId(String openId, String userSource) {
         LambdaQueryWrapper<GmUser> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(GmUser::getOpenId, openId)
-                   .eq(GmUser::getUserSource, userSource)
-                   .eq(GmUser::getEffective, "1")
-                   .eq(GmUser::getDestroy, "0");
+                .eq(GmUser::getUserSource, userSource)
+                .eq(GmUser::getEffective, "1")
+                .eq(GmUser::getDestroy, "0");
         return gmUserMapper.selectOne(queryWrapper);
     }
 

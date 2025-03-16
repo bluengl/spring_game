@@ -1,6 +1,8 @@
 package com.ngl.idea.game.common.security.filter;
 
+import com.ngl.idea.game.common.core.exception.BusinessException;
 import com.ngl.idea.game.common.core.model.TokenUser;
+import com.ngl.idea.game.common.core.model.response.ResultCode;
 import com.ngl.idea.game.common.core.util.RedisUtil;
 import com.ngl.idea.game.common.core.util.ServiceLocator;
 import com.ngl.idea.game.common.security.util.JwtUtils;
@@ -14,6 +16,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -30,33 +34,43 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (!jwtUtils.isIgnoreRequest(request)) {
             // 如果没有token
             if (token == null) {
-                defaultResponse(response, "401", "未授权");
+                defaultResponse(response, "401", "未授权,请先登录");
                 return;
-            } else if (!jwtUtils.validateJwtToken(token)) {
-                defaultResponse(response, "403", "token已失效");
+            }
+            // 获取请求的URI
+            String requestURI = request.getRequestURI();
+            if (!jwtUtils.validateJwtToken(token)) {
+                if (requestURI.contains("/refreshToken")) {
+                    defaultResponse(response, "401", "refreshToken已失效,请重新登录");
+                } else {
+                    defaultResponse(response, "403", "token已失效");
+                }
                 return;
             }
 
             // 从token中提取用户信息
             TokenUser tokenUser = jwtUtils.extractTokenUser(token);
+            if (tokenUser == null) {
+                defaultResponse(response, "401", "token解析失败,请重新登录");
+                return;
+            }
             String tokenType = tokenUser.getTokenType();
             String tokenCode = tokenUser.getTokenCode();
+            assert redisUtil != null;
             String redisTokenCode = (String) redisUtil.get("userTokenCode-" + tokenUser.getUserId());
-            // 获取请求的URI
-            String requestURI = request.getRequestURI();
             // 判断请求是不是refreshToken
             if ("refreshToken".equals(tokenType)) {
                 if (!requestURI.contains("/refreshToken")) {
-                    defaultResponse(response, "405", "错误使用refreshToken");
+                    defaultResponse(response, "401", "错误使用refreshToken,请重新登录");
                     return;
                 } else {
                     redisTokenCode = (String) redisUtil.get("userRefreshTokenCode-" + tokenUser.getUserId());
-                    if (tokenCode == null || redisTokenCode == null || !tokenCode.equals(redisTokenCode)) {
-                        defaultResponse(response, "401", "refreshToken已失效");
+                    if (tokenCode == null || !tokenCode.equals(redisTokenCode)) {
+                        defaultResponse(response, "401", "refreshToken已失效,请重新登录");
                         return;
                     }
                 }
-            } else if (tokenCode == null || redisTokenCode == null || !tokenCode.equals(redisTokenCode)) {
+            } else if (!jwtUtils.validateJwtToken(token) || tokenCode == null || !tokenCode.equals(redisTokenCode)) {
                 defaultResponse(response, "403", "token已失效");
                 return;
             }
@@ -82,7 +96,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-        response.getWriter().write("{\"status\":" + code + ",\"error\":\"" + error + "\",\"timestamp\": " + System.currentTimeMillis() + "}");
+        response.getWriter().write("{\"status\":" + code + ",\"error\":\"" + error + "\",\"timestamp\": \"" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + "\"}");
     }
 
 }
