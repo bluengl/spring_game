@@ -49,7 +49,9 @@ public class JwtUtils {
         claims.put("tokenType", "accessToken");
         Long expiration = configManager.getSecurityConfig().getJwt().getExpiration();
         String token = createToken(claims, tokenUser.getUserId(), expiration);
-        redisUtil.set("userTokenCode-" + tokenUser.getUserId(), tokenCode, expiration);
+        if (configManager.getSecurityConfig().getJwt().getOnceLogin()) {
+            redisUtil.set("userTokenCode-" + tokenUser.getUserId(), tokenCode, expiration);
+        }
         return token;
     }
 
@@ -63,7 +65,9 @@ public class JwtUtils {
         claims.put("tokenType", "refreshToken");
         Long refreshExpiration = configManager.getSecurityConfig().getJwt().getRefreshExpiration();
         String token = createToken(claims, tokenUser.getUserId(), refreshExpiration);
-        redisUtil.set("userRefreshTokenCode-" + tokenUser.getUserId(), tokenCode, refreshExpiration);
+        if (configManager.getSecurityConfig().getJwt().getOnceLogin()) {
+            redisUtil.set("userRefreshTokenCode-" + tokenUser.getUserId(), tokenCode, refreshExpiration);
+        }
         return token;
     }
 
