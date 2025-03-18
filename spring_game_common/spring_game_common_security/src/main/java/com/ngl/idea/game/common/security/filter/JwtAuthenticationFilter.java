@@ -1,9 +1,7 @@
 package com.ngl.idea.game.common.security.filter;
 
 import com.ngl.idea.game.common.config.manager.ConfigManager;
-import com.ngl.idea.game.common.core.exception.BusinessException;
 import com.ngl.idea.game.common.core.model.TokenUser;
-import com.ngl.idea.game.common.core.model.response.ResultCode;
 import com.ngl.idea.game.common.core.util.RedisUtil;
 import com.ngl.idea.game.common.core.util.ServiceLocator;
 import com.ngl.idea.game.common.security.util.JwtUtils;
@@ -83,21 +81,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     return;
                 }
             }
-
-            // 装饰请求,添加用户信息
-            HttpServletRequest decoratedRequest = new TokenUserHttpServletRequest(request, tokenUser);
-
             // 继续过滤器链
-            filterChain.doFilter(decoratedRequest, response);
+            filterChain.doFilter(new TokenUserHttpServletRequest(request, tokenUser), response);
+        } else if (token != null && jwtUtils.validateJwtToken(token)) {
+            filterChain.doFilter(new TokenUserHttpServletRequest(request, jwtUtils.extractTokenUser(token)), response);
         } else {
-            // 继续过滤器链
-            if (token != null && jwtUtils.validateJwtToken(token)) {
-                TokenUser tokenUser = jwtUtils.extractTokenUser(token);
-                HttpServletRequest decoratedRequest = new TokenUserHttpServletRequest(request, tokenUser);
-                filterChain.doFilter(decoratedRequest, response);
-            } else {
-                filterChain.doFilter(request, response);
-            }
+            filterChain.doFilter(new TokenUserHttpServletRequest(request, new TokenUser()), response);
         }
     }
 

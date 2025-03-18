@@ -6,3 +6,121 @@ spring:
     name: base-api
   profiles:
     active: dev
+  
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/game_db?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: game01
+    password: game01
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 15
+      auto-commit: true
+      idle-timeout: 30000
+      pool-name: HikariCP
+      max-lifetime: 1800000
+      connection-timeout: 30000
+      connection-test-query: SELECT 1
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    password: 10Lxygwqf*
+    database: 0
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 0
+        max-wait: -1ms
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
+  packages-to-scan: com.ngl.idea.game
+  paths-to-match: /**
+  show-actuator: false
+  default-produces-media-type: application/json
+  default-consumes-media-type: application/json
+  writer-with-default-pretty-printer: true
+logging:
+  level:
+    org.springdoc: DEBUG
+    org.springframework.web: DEBUG
+    com.ngl.idea.game: DEBUG
+game:
+  wechat:
+    appid: wxd09dc17358612ad4
+    secret: 2173e8e4e30dbd88fcdee08444f99bc9
+    codeToSessionUrl: https://api.weixin.qq.com/sns/jscode2session
+  
+  encryption:
+    enabled: false
+    encryptionType: sm2
+    encryption:
+      secret: your-secret-key-must-be-at-least-32-characters-long
+      iv: your-iv-must-be-16-characters-long
+    ignore:
+      urls:
+        - /api/base/login
+
+  security:
+    cors:
+      allowed-origins:
+        - http://localhost:8080
+        - http://127.0.0.1:8080
+        - http://localhost:8002
+        - http://127.0.0.1:8002
+      exposed-headers:
+        - Authorization
+      allowed-headers:
+        - Content-Type
+        - Authorization
+        - X-Requested-With
+        - x-encrypted
+        - x-encrypt-type
+        - Access-Control-Request-Headers
+        - Access-Control-Request-Method
+        - Access-Control-Allow-Origin
+        - Origin
+        - Accept
+      allowed-methods:
+        - POST
+        - GET
+        - DELETE
+        - UPDATE
+        - OPTIONS
+        - PUT
+      allow-credentials: true
+      max-age: 3600
+    jwt:
+      secret: hfdjshfjdhfdsjfhsdjfhkdshfksddfdsfsdfsdfdsfdsfdsfdsfdsfdsf
+      expiration: 50000000
+      header: Authorization
+      prefix: Bearer
+      allow-refresh: true
+      refresh-expiration: 604800000
+      once-login: false
+    ignore:
+      urls:
+        - /api/game/gameList
+        - /api/base/getSystemConfig
+        - /api/base/login
+        - /api/base/wxLogin
+        - /api/base/register
+        - /error
+        - /actuator/**
+        - /v3/api-docs/**
+        - /swagger-ui/**
+        - /swagger-resources/**
+        - /webjars/**
+        - /favicon.ico
+        - /swagger-ui.html
+  
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml
+  type-aliases-package: com.ngl.idea.game.core.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
