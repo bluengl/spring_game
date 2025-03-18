@@ -33,7 +33,7 @@
         <mysql.version>8.0.28</mysql.version>
         <log4j.version>2.22.1</log4j.version>
         <nacos.version>1.4.3</nacos.version>
-        <swagger.version>2.9.2</swagger.version>
+        <springdoc.version>1.6.15</springdoc.version>
         <fastjson.version>1.2.83</fastjson.version>
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
         <spring-boot-maven-plugin.version>2.7.18</spring-boot-maven-plugin.version>
@@ -95,18 +95,6 @@
                 <groupId>org.apache.logging.log4j</groupId>
                 <artifactId>log4j-slf4j2-impl</artifactId>
                 <version>${log4j.version}</version>
-            </dependency>
-
-            <!-- Swagger -->
-            <dependency>
-                <groupId>io.springfox</groupId>
-                <artifactId>springfox-swagger2</artifactId>
-                <version>${swagger.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.springfox</groupId>
-                <artifactId>springfox-swagger-ui</artifactId>
-                <version>${swagger.version}</version>
             </dependency>
 
             <!-- FastJSON -->

@@ -1,7 +1,6 @@
 package com.ngl.idea.game.game.dto;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -10,27 +9,27 @@ import java.time.LocalDateTime;
  * 游戏配置信息DTO
  */
 @Data
-@ApiModel(description = "游戏配置信息")
+@Schema(description = "游戏配置信息")
 public class GameConfigDTO {
     
-    @ApiModelProperty("配置ID")
+    @Schema(description = "配置ID")
     private String configId;
     
-    @ApiModelProperty("游戏ID")
+    @Schema(description = "游戏ID")
     private String gameId;
     
-    @ApiModelProperty("配置键")
+    @Schema(description = "配置键")
     private String configKey;
     
-    @ApiModelProperty("配置值")
+    @Schema(description = "配置值")
     private String configValue;
     
-    @ApiModelProperty("配置描述")
+    @Schema(description = "配置描述")
     private String configDescription;
     
-    @ApiModelProperty("创建时间")
+    @Schema(description = "创建时间")
     private LocalDateTime createTime;
     
-    @ApiModelProperty("更新时间")
+    @Schema(description = "更新时间")
     private LocalDateTime updateTime;
 } 

@@ -1,159 +1,132 @@
 package com.ngl.idea.game.user.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.ngl.idea.game.base.dto.UserDTO;
-import com.ngl.idea.game.common.core.exception.BusinessException;
-import com.ngl.idea.game.common.core.model.response.ResultCode;
 import com.ngl.idea.game.common.core.util.UUIDUtils;
 import com.ngl.idea.game.core.entity.GmUser;
 import com.ngl.idea.game.core.entity.GmUserAvatar;
-import com.ngl.idea.game.core.mapper.GmUserMapper;
 import com.ngl.idea.game.core.mapper.GmUserAvatarMapper;
+import com.ngl.idea.game.core.mapper.GmUserMapper;
 import com.ngl.idea.game.user.dto.UserAvatarDTO;
 import com.ngl.idea.game.user.service.UserInfoService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 用户信息服务实现类
  */
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserInfoServiceImpl implements UserInfoService {
 
-    private final GmUserMapper userMapper;
-    private final GmUserAvatarMapper avatarMapper;
+    private final GmUserMapper gmUserMapper;
+    private final GmUserAvatarMapper gmUserAvatarMapper;
 
     @Override
     public UserDTO getUserInfo(String userId) {
-        GmUser user = userMapper.selectById(userId);
-        if (user == null) {
-            throw new BusinessException(ResultCode.USER_NOT_FOUND);
+        GmUser gmUser = gmUserMapper.selectById(userId);
+        if (gmUser == null) {
+            return null;
         }
         UserDTO userDTO = new UserDTO();
-        BeanUtils.copyProperties(user, userDTO);
+        BeanUtils.copyProperties(gmUser, userDTO);
         return userDTO;
-    }
-    
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void updateUserInfo(String userId, UserDTO userDTO) {
-        GmUser user = userMapper.selectById(userId);
-        if (user == null) {
-            throw new BusinessException(ResultCode.USER_NOT_FOUND);
-        }
-        BeanUtils.copyProperties(userDTO, user);
-        userMapper.updateById(user);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public UserAvatarDTO uploadAvatar(String userId, String base64) {
-        // 验证用户是否存在
-        GmUser user = userMapper.selectById(userId);
-        if (user == null) {
-            throw new BusinessException(ResultCode.USER_NOT_FOUND);
-        }
-
-        // 查询用户当前头像
-        UserAvatarDTO currentAvatar = getCurrentAvatar(userId);
-        if (currentAvatar != null) {
-            // 更新当前头像状态
-            GmUserAvatar updateAvatar = new GmUserAvatar();
-            updateAvatar.setAvatarId(currentAvatar.getAvatarId());
-            updateAvatar.setActive("0");
-            updateAvatar.setUpdateTime(LocalDateTime.now());
-            avatarMapper.updateById(updateAvatar);
-        }
-
-        // 生成新的头像版本
-        String version = UUIDUtils.getUUID();
-
-        // 创建新的头像记录
+        // 更新之前的头像为非激活状态
+        LambdaUpdateWrapper<GmUserAvatar> updateWrapper = Wrappers.lambdaUpdate();
+        updateWrapper.eq(GmUserAvatar::getUserId, userId)
+                .eq(GmUserAvatar::getActive, "1")
+                .eq(GmUserAvatar::getStatus, "1")
+                .set(GmUserAvatar::getActive, "0")
+                .set(GmUserAvatar::getUpdateTime, LocalDateTime.now());
+        gmUserAvatarMapper.update(null, updateWrapper);
+        // 生成随机头像ID
+        String avatarId = UUIDUtils.getUUID();
+        // 创建头像记录
         GmUserAvatar avatar = new GmUserAvatar();
+        avatar.setAvatarId(avatarId);
         avatar.setUserId(userId);
         avatar.setBase64(base64);
-        avatar.setVersion(version);
-        avatar.setStatus("1"); // 1-有效
-        avatar.setActive("1"); // 1-有效
+        avatar.setVersion(UUIDUtils.getUUID());
+        avatar.setStatus("1");
+        avatar.setActive("1");
         avatar.setCreateTime(LocalDateTime.now());
-
-        // 保存头像
-        avatarMapper.insert(avatar);
-
+        // 保存头像记录
+        gmUserAvatarMapper.insert(avatar);
         // 转换为DTO
-        UserAvatarDTO avatarDTO = new UserAvatarDTO();
-        BeanUtils.copyProperties(avatar, avatarDTO);
-        return avatarDTO;
+        return convertToDTO(avatar);
     }
 
     @Override
     public UserAvatarDTO getCurrentAvatar(String userId) {
-        // 查询用户最新的有效头像
-        LambdaQueryWrapper<GmUserAvatar> queryWrapper = new LambdaQueryWrapper<>();
+        // 查询最新的头像记录
+        LambdaQueryWrapper<GmUserAvatar> queryWrapper = Wrappers.lambdaQuery();
         queryWrapper.eq(GmUserAvatar::getUserId, userId)
-                .eq(GmUserAvatar::getStatus, "1")
                 .eq(GmUserAvatar::getActive, "1")
+                .eq(GmUserAvatar::getStatus, "1")
                 .orderByDesc(GmUserAvatar::getCreateTime)
                 .last("LIMIT 1");
-
-        GmUserAvatar avatar = avatarMapper.selectOne(queryWrapper);
+        GmUserAvatar avatar = gmUserAvatarMapper.selectOne(queryWrapper);
+        // 如果没有头像记录，返回null
         if (avatar == null) {
             return null;
         }
-
-        UserAvatarDTO avatarDTO = new UserAvatarDTO();
-        BeanUtils.copyProperties(avatar, avatarDTO);
-        return avatarDTO;
+        // 转换为DTO
+        return convertToDTO(avatar);
     }
 
     @Override
     public UserAvatarDTO getAvatarByVersion(String userId, String version) {
-        // 查询指定版本的头像
-        LambdaQueryWrapper<GmUserAvatar> queryWrapper = new LambdaQueryWrapper<>();
+        // 查询指定版本的头像记录
+        LambdaQueryWrapper<GmUserAvatar> queryWrapper = Wrappers.lambdaQuery();
         queryWrapper.eq(GmUserAvatar::getUserId, userId)
-                .eq(GmUserAvatar::getVersion, version)
-                .eq(GmUserAvatar::getStatus, "1");
-
-        GmUserAvatar avatar = avatarMapper.selectOne(queryWrapper);
+                .eq(GmUserAvatar::getStatus, "1")
+                .eq(GmUserAvatar::getVersion, version);
+        GmUserAvatar avatar = gmUserAvatarMapper.selectOne(queryWrapper);
+        // 如果没有头像记录，返回null
         if (avatar == null) {
             return null;
         }
-
-        UserAvatarDTO avatarDTO = new UserAvatarDTO();
-        BeanUtils.copyProperties(avatar, avatarDTO);
-        return avatarDTO;
+        // 转换为DTO
+        return convertToDTO(avatar);
     }
 
     @Override
     public List<UserAvatarDTO> getAvatarList(String userId) {
-        // 查询用户所有有效头像
-        LambdaQueryWrapper<GmUserAvatar> queryWrapper = new LambdaQueryWrapper<>();
+        // 查询头像记录列表
+        LambdaQueryWrapper<GmUserAvatar> queryWrapper = Wrappers.lambdaQuery();
         queryWrapper.eq(GmUserAvatar::getUserId, userId)
                 .eq(GmUserAvatar::getStatus, "1")
                 .orderByDesc(GmUserAvatar::getCreateTime);
-
-        List<GmUserAvatar> avatarList = avatarMapper.selectList(queryWrapper);
-        if (avatarList == null || avatarList.isEmpty()) {
-            return Collections.emptyList();
+        List<GmUserAvatar> avatarList = gmUserAvatarMapper.selectList(queryWrapper);
+        // 转换为DTO列表
+        List<UserAvatarDTO> dtoList = new ArrayList<>();
+        for (GmUserAvatar avatar : avatarList) {
+            dtoList.add(convertToDTO(avatar));
         }
+        return dtoList;
+    }
 
-        return avatarList.stream()
-                .map(avatar -> {
-                    UserAvatarDTO avatarDTO = new UserAvatarDTO();
-                    BeanUtils.copyProperties(avatar, avatarDTO);
-                    return avatarDTO;
-                })
-                .collect(Collectors.toList());
+    /**
+     * 将实体转换为DTO
+     * @param avatar 头像实体
+     * @return 头像DTO
+     */
+    private UserAvatarDTO convertToDTO(GmUserAvatar avatar) {
+        UserAvatarDTO dto = new UserAvatarDTO();
+        BeanUtils.copyProperties(avatar, dto);
+        return dto;
     }
 } 

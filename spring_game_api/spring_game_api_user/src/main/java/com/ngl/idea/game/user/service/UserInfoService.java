@@ -11,53 +11,39 @@ import com.ngl.idea.game.user.dto.UserAvatarDTO;
 public interface UserInfoService {
     
     /**
-     * 根据用户ID查询用户信息
-     *
+     * 获取用户信息
      * @param userId 用户ID
-     * @return 用户信息
+     * @return 用户DTO
      */
     UserDTO getUserInfo(String userId);
-
-    /**
-     * 更新用户信息
-     *
-     * @param userId 用户ID
-     * @param userDTO 用户信息
-     */
-    void updateUserInfo(String userId, UserDTO userDTO);
     
     /**
      * 上传用户头像
-     *
      * @param userId 用户ID
      * @param base64 Base64编码的头像数据
-     * @return 头像信息
+     * @return 用户头像DTO
      */
     UserAvatarDTO uploadAvatar(String userId, String base64);
     
     /**
      * 获取用户当前头像
-     *
      * @param userId 用户ID
-     * @return 头像信息
+     * @return 用户头像DTO
      */
     UserAvatarDTO getCurrentAvatar(String userId);
     
     /**
-     * 获取用户指定版本的头像
-     *
+     * 根据版本获取用户头像
      * @param userId 用户ID
-     * @param version 头像版本
-     * @return 头像信息
+     * @param version 版本
+     * @return 用户头像DTO
      */
     UserAvatarDTO getAvatarByVersion(String userId, String version);
     
     /**
      * 获取用户头像列表
-     *
      * @param userId 用户ID
-     * @return 头像列表
+     * @return 用户头像DTO列表
      */
     List<UserAvatarDTO> getAvatarList(String userId);
-
 } 

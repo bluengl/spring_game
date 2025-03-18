@@ -15,10 +15,10 @@
     <modules>
         <module>spring_game_api_core</module>
         <module>spring_game_api_base</module>
-        <module>spring_game_api_user</module>
         <module>spring_game_api_game</module>
         <module>spring_game_api_group</module>
         <module>spring_game_api_online</module>
+        <module>spring_game_api_user</module>
     </modules>
 
     <dependencies>
@@ -43,17 +43,18 @@
             <version>${project.version}</version>
         </dependency>
 
-        <!-- Swagger -->
+        <!-- SpringDoc OpenAPI -->
         <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
-            <version>${swagger.version}</version>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-ui</artifactId>
+            <version>${springdoc.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger-ui</artifactId>
-            <version>${swagger.version}</version>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-webmvc-core</artifactId>
+            <version>${springdoc.version}</version>
         </dependency>
+        <!-- fastjson -->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>

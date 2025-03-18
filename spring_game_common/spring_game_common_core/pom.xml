@@ -81,5 +81,13 @@
             <artifactId>bcprov-jdk15on</artifactId>
             <version>1.69</version>
         </dependency>
+
+        <!-- FastJSON -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>${fastjson.version}</version>
+        </dependency>
+
     </dependencies>
 </project>

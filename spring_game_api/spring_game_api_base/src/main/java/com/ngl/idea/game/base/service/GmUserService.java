@@ -22,6 +22,13 @@ public interface GmUserService {
      * @throws Exception 
      */
     LoginResponse login(LoginRequest request) throws Exception;
+
+    /**
+     * 微信登录
+     * @param request 微信登录请求
+     * @return 登录响应
+     */
+    LoginResponse wxLogin(WechatLoginRequest request);
     
     /**
      * 用户注册

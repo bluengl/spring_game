@@ -4,10 +4,12 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ngl.idea.game.base.dto.*;
 import com.ngl.idea.game.base.service.GmUserService;
 import com.ngl.idea.game.common.config.manager.ConfigManager;
+import com.ngl.idea.game.common.config.properties.WechatProperties;
 import com.ngl.idea.game.common.core.exception.BusinessException;
 import com.ngl.idea.game.common.core.model.response.ResultCode;
 import com.ngl.idea.game.common.core.util.AesUtils;
 import com.ngl.idea.game.common.core.util.BcryptUtils;
+import com.ngl.idea.game.common.core.util.HttpUtils;
 import com.ngl.idea.game.common.security.util.JwtUtils;
 import com.ngl.idea.game.core.entity.GmUser;
 import com.ngl.idea.game.core.mapper.GmUserMapper;
@@ -15,8 +17,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -41,6 +46,96 @@ public class GmUserServiceImpl implements GmUserService {
         response.setOpenId(openId);
         response.setUserSource(request.getUserSource());
         return response;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public LoginResponse wxLogin(WechatLoginRequest request) {
+        log.info("微信用户登录请求: {}", request.getCode());
+        
+        if (!StringUtils.hasText(request.getCode())) {
+            throw new BusinessException(ResultCode.PARAM_ERROR.getCode(), "微信code不能为空");
+        }
+        
+        // 调用微信API获取openId
+        WechatSessionResponse sessionResponse = getWechatSession(request.getCode());
+        
+        if (sessionResponse == null || !StringUtils.hasText(sessionResponse.getOpenid())) {
+            throw new BusinessException(ResultCode.INTERNAL_SERVER_ERROR.getCode(), "获取微信openId失败");
+        }
+        
+        String openId = sessionResponse.getOpenid();
+        log.info("获取到微信openId: {}", openId);
+        
+        // 根据openId查询用户
+        GmUser user = findByOpenId(openId, "WECHAT");
+        
+        // 如果用户不存在，则注册新用户
+        if (user == null) {
+            log.info("用户不存在，开始注册新用户: {}", openId);
+            // 创建注册请求
+            RegisterRequest registerRequest = new RegisterRequest();
+            // 使用随机用户名
+            String username = "wx_" + UUID.randomUUID().toString().substring(0, 8);
+            registerRequest.setUsername(username);
+            // 生成随机密码
+            String password = UUID.randomUUID().toString().substring(0, 16);
+            // 模拟加密密码
+            registerRequest.setPassword(AesUtils.encryptSimpleJs(password, "12345678901234567890123456789012"));
+            registerRequest.setOpenId(openId);
+            registerRequest.setUserSource("WECHAT");
+            
+            // 如果有用户信息，设置昵称为用户名
+            WechatLoginRequest.UserInfo userInfo = request.getUserInfo();
+            if (userInfo != null && StringUtils.hasText(userInfo.getNickName())) {
+                registerRequest.setUsername(userInfo.getNickName());
+            }
+            
+            // 注册用户
+            register(registerRequest);
+            
+            // 获取新注册的用户
+            user = findByOpenId(openId, "WECHAT");
+        }
+        
+        // 生成token
+        String accessToken = jwtUtils.generateToken(user);
+        String refreshToken = jwtUtils.generateRefreshToken(user);
+        
+        // 构建响应
+        LoginResponse response = new LoginResponse();
+        response.setUser(convertToDTO(user));
+        response.setAccessToken(accessToken);
+        if (configManager.getSecurityConfig().getJwt().getAllowRefresh()) {
+            response.setRefreshToken(refreshToken);
+        }
+        
+        log.info("微信用户登录成功: {}", openId);
+        return response;
+    }
+    
+    /**
+     * 调用微信接口获取session信息
+     *
+     * @param code 微信授权code
+     * @return 微信session响应
+     */
+    private WechatSessionResponse getWechatSession(String code) {
+        try {
+            WechatProperties wechatProperties = configManager.getWechatConfig();
+            String url = wechatProperties.getCodeToSessionUrl();
+            Map<String, String> params = new HashMap<>();
+            params.put("appid", wechatProperties.getAppid());
+            params.put("secret", wechatProperties.getSecret());
+            params.put("js_code", code);
+            params.put("grant_type", "authorization_code");
+            
+            log.info("请求微信code2session接口: {}, 参数: {}", url, params);
+            return HttpUtils.doGet(url, params, WechatSessionResponse.class);
+        } catch (Exception e) {
+            log.error("请求微信code2session接口失败", e);
+            return null;
+        }
     }
 
     @Override
@@ -122,8 +217,8 @@ public class GmUserServiceImpl implements GmUserService {
             user.setPassword(BcryptUtils.encode(decryptedPassword));
             user.setUserSource(request.getUserSource());
             user.setOpenId(request.getOpenId());
-            user.setEffective("Y");
-            user.setDestroy("N");
+            user.setEffective("1");
+            user.setDestroy("0");
             user.setCreateTime(LocalDateTime.now());
             user.setUpdateTime(LocalDateTime.now());
 
@@ -191,7 +286,6 @@ public class GmUserServiceImpl implements GmUserService {
         dto.setUserId(user.getUserId());
         dto.setUsername(user.getUsername());
         dto.setUserSource(user.getUserSource());
-        dto.setOpenId(user.getOpenId());
         dto.setCreateTime(user.getCreateTime());
         return dto;
     }

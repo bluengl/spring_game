@@ -1,63 +1,76 @@
 package com.ngl.idea.game.base.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.util.List;
 
 @Data
+@Schema(description = "系统配置信息")
 public class SystemConfig implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
      * 是否启用加密
      */
+    @Schema(description = "是否启用加密")
     private Boolean enableEncryption;
 
     /**
      * 加密忽略URL
      */
+    @Schema(description = "加密忽略URL")
     private List<String> encryptionIgnoreUrls;
 
     /**
      * 安全忽略URL
      */
+    @Schema(description = "安全忽略URL")
     private List<String> securityIgnoreUrls;
 
     /**
      * JWT信息
      */
+    @Schema(description = "JWT信息")
     private JwtInfo jwtInfo;
 
     /**
      * 密钥信息
      */
+    @Schema(description = "密钥信息")
     private KeyInfo keyInfo;
 
     /**
      * 加密类型
      */
+    @Schema(description = "加密类型")
     private String encryptionType;
 
     /**
      * rsa公钥
      */
+    @Schema(description = "RSA公钥")
     private String rsaPublicKey;
 
     /**
      * sm2公钥
      */
+    @Schema(description = "SM2公钥")
     private String sm2PublicKey;
 
+    @Schema(description = "密钥信息")
     public static class KeyInfo {
         /**
          * RSA公钥
          */
+        @Schema(description = "RSA公钥")
         private String rsaPublicKey;
 
         /**
          * SM2公钥
          */
+        @Schema(description = "SM2公钥")
         private String sm2PublicKey;
 
         public String getRsaPublicKey() {   
@@ -75,13 +88,11 @@ public class SystemConfig implements Serializable {
         public void setSm2PublicKey(String sm2PublicKey) {
             this.sm2PublicKey = sm2PublicKey;
         }   
-
     }
 
+    @Schema(description = "JWT信息")
     public static class JwtInfo {
-
         public JwtInfo() {
-
         }
 
         public JwtInfo(String header, String prefix, Boolean allowRefresh) {
@@ -90,8 +101,13 @@ public class SystemConfig implements Serializable {
             this.allowRefresh = allowRefresh;
         }
 
+        @Schema(description = "JWT头部")
         private String header;
+
+        @Schema(description = "JWT前缀")
         private String prefix;
+
+        @Schema(description = "是否允许刷新")
         private Boolean allowRefresh;
 
         public String getHeader() {
@@ -118,5 +134,4 @@ public class SystemConfig implements Serializable {
             this.allowRefresh = allowRefresh;
         }
     }
-
 }

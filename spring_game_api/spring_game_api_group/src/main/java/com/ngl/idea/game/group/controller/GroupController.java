@@ -2,12 +2,10 @@ package com.ngl.idea.game.group.controller;
 
 import com.ngl.idea.game.common.core.model.TokenUser;
 import com.ngl.idea.game.common.core.model.response.ApiResponse;
-import com.ngl.idea.game.common.security.filter.TokenUserHttpServletRequest;
 import com.ngl.idea.game.core.controller.GameBaseController;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 
 @RestController

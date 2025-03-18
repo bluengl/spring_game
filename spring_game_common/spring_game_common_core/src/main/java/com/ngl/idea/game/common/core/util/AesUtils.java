@@ -438,4 +438,60 @@ public class AesUtils {
             throw new Exception("解密失败: " + e.getMessage(), e);
         }
     }
+
+    /**
+     * 简化版JS加密方法，用于前端加密传输，使用简单XOR加密 (与decryptSimpleJs对称)
+     *
+     * @param data 待加密数据
+     * @param key 原始密钥字符串
+     * @return 加密结果，格式为 salt:iv:ciphertext (均为Base64编码)
+     */
+    public static String encryptSimpleJs(String data, String key) {
+        try {
+            log.debug("开始使用简单XOR加密数据，长度: {}", data.length());
+            
+            // 生成随机盐值
+            byte[] saltBytes = new byte[16];
+            new SecureRandom().nextBytes(saltBytes);
+            
+            // 生成随机IV
+            byte[] ivBytes = new byte[16];
+            new SecureRandom().nextBytes(ivBytes);
+            
+            // 将密钥转换为字节
+            byte[] keyBytes = key.getBytes(StandardCharsets.UTF_8);
+            
+            // 获取明文字节
+            byte[] plaintextBytes = data.getBytes(StandardCharsets.UTF_8);
+            
+            // 使用简单的XOR加密
+            byte[] ciphertextBytes = new byte[plaintextBytes.length];
+            for (int i = 0; i < plaintextBytes.length; i++) {
+                // 使用密钥、盐值和IV混合创建XOR掩码
+                byte keyByte = keyBytes[i % keyBytes.length];
+                byte saltByte = saltBytes[i % saltBytes.length];
+                byte ivByte = ivBytes[i % ivBytes.length];
+                
+                // 混合掩码
+                byte mask = (byte) ((keyByte ^ saltByte ^ ivByte) % 256);
+                
+                // 加密当前字节
+                ciphertextBytes[i] = (byte) (plaintextBytes[i] ^ mask);
+            }
+            
+            // 将盐值、IV和密文编码为Base64
+            String saltBase64 = Base64.getEncoder().encodeToString(saltBytes);
+            String ivBase64 = Base64.getEncoder().encodeToString(ivBytes);
+            String ciphertextBase64 = Base64.getEncoder().encodeToString(ciphertextBytes);
+            
+            // 组合为最终密文格式
+            String result = String.format("%s:%s:%s", saltBase64, ivBase64, ciphertextBase64);
+            
+            log.debug("简单XOR加密成功，密文长度: {}", result.length());
+            return result;
+        } catch (Exception e) {
+            log.error("简单XOR加密失败: {}", e.getMessage(), e);
+            throw new RuntimeException("加密失败", e);
+        }
+    }
 }

@@ -1,5 +1,5 @@
-wechat:
-  miniapp:
+game:
+  wechat:
     appid: wxd09dc17358612ad4
     secret: 12345678901234567890123456789012
     codeToSessionUrl: https://api.weixin.qq.com/sns/jscode2session

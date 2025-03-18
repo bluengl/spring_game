@@ -1,5 +1,7 @@
 package com.ngl.idea.game.core.entity;
 
+import java.time.LocalDateTime;
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -29,28 +31,34 @@ public class GmGameRecord {
     private String userId;
 
     /**
+     * 用户名
+     */
+    @TableField("USER_NAME")
+    private String username;
+
+    /**
      * 游戏等级
      */
     @TableField("GAME_LEVEL")
-    private String gameLevel;
+    private Integer gameLevel;
 
     /**
      * 游戏分数
      */
     @TableField("GAME_SCORE")
-    private String gameScore;
+    private Integer gameScore;
 
     /**
      * 创建时间
      */
     @TableField("CREATE_TIME")
-    private String createTime;
+    private LocalDateTime createTime;
 
     /**
      * 更新时间
      */
     @TableField("UPDATE_TIME")
-    private String updateTime;
+    private LocalDateTime updateTime;
 
     /**
      * 是否销毁

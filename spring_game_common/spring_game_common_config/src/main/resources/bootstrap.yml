@@ -18,3 +18,9 @@ spring:
           - data-id: encryption.yml
             group: GAME_NAMESPACE_GROUP
             refresh: true
+          - data-id: wxmini.yml
+            group: GAME_NAMESPACE_GROUP
+            refresh: true
+          - data-id: base.yml
+            group: GAME_NAMESPACE_GROUP
+            refresh: true

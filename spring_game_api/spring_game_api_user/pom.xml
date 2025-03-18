@@ -12,24 +12,11 @@
     <artifactId>spring_game_api_user</artifactId>
 
     <dependencies>
-        <!-- Spring Game Common Core -->
-        <dependency>
-            <groupId>com.ngl.idea.game</groupId>
-            <artifactId>spring_game_common_core</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        
+
         <!-- Spring Boot Web -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-
-        <!-- Spring Game API Core -->
-        <dependency>
-            <groupId>com.ngl.idea.game</groupId>
-            <artifactId>spring_game_api_core</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <!-- Spring Game API Base -->
@@ -39,28 +26,25 @@
             <version>${project.version}</version>
         </dependency>
 
-        <!-- Swagger -->
+        <!-- SpringDoc OpenAPI -->
         <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-ui</artifactId>
+            <version>${springdoc.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger-ui</artifactId>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-webmvc-core</artifactId>
+            <version>${springdoc.version}</version>
         </dependency>
 
         <!-- FastJSON -->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
+            <version>${fastjson.version}</version>
         </dependency>
 
-        <!-- Lombok -->
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <optional>true</optional>
-        </dependency>
     </dependencies>
 
     <build>

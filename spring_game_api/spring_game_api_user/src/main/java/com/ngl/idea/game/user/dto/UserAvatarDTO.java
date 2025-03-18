@@ -35,6 +35,11 @@ public class UserAvatarDTO {
     private String status;
     
     /**
+     * 是否激活
+     */
+    private String active;
+    
+    /**
      * 创建时间
      */
     private LocalDateTime createTime;

@@ -28,6 +28,9 @@ public class ConfigManager {
     @Autowired
     private MybatisPlusProperties mybatisPlusProperties;
 
+    @Autowired
+    private WechatProperties wechatProperties;
+
     /**
      * 获取安全配置
      */
@@ -84,4 +87,11 @@ public class ConfigManager {
         return mybatisPlusProperties;
     }
 
+    /**
+     * 获取微信配置
+     */
+    public WechatProperties getWechatConfig() {
+        return wechatProperties;
+    }
+    
 }
